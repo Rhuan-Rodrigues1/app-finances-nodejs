@@ -1,0 +1,30 @@
+{
+  "name": "bitcoin-candle-generator",
+  "version": "1.0.0",
+  "description": "gerando candles do preço do bitcoin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node src/server.js",
+    "tsc": "tsc"
+  },
+  "keywords": [
+    "Node.js",
+    "JavaScript",
+    "TypeScript",
+    "RabbitMQ"
+  ],
+  "author": "Rhuan-Rodrigues1",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.10.3",
+    "axios": "^1.2.0",
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.0",
+    "@types/node": "^18.11.10",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.3"
+  }
+}
