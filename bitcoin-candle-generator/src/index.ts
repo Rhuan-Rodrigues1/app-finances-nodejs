@@ -12,11 +12,13 @@ export class ClientRequestError extends InternalError {
     }
   }
 
-const readPrice = async (): Promise<number> => {
+const readPrice = async (): Promise<any> => {
     try {
         const result = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
         const data = result.data
         const price = data.bitcoin.usd
+        
+        
         return price
 
     } catch (err) {
