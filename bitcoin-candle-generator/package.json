@@ -19,7 +19,7 @@
   "dependencies": {
     "amqplib": "^0.10.3",
     "axios": "^0.25.0",
-    "dotenv": "^16.0.3"
+    "dotenv": "^14.3.2"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.0",

@@ -1,6 +1,8 @@
 import { config } from "dotenv";
 import { InternalError } from "./utils/errors/InternalError";
 import axios, {AxiosError} from "axios";
+import Period from "./enums/Period";
+import Candle from "./models/Candle";
 
 config()
 
@@ -12,9 +14,9 @@ export class ClientRequestError extends InternalError {
     }
   }
 
-const readPrice = async (): Promise<any> => {
+const readPrice = async (): Promise<number> => {
     try {
-        const result = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
+        const result = await axios.get(process.env.PRICES_API)
         const data = result.data
         const price = data.bitcoin.usd
         
@@ -39,4 +41,27 @@ const readPrice = async (): Promise<any> => {
 }
 
 
-readPrice()
+const generateCandles = async () => {
+    const loopTime = Period.ONE_MINUTE / Period.TEN_SECONDS
+    const candles = new Candle('BTC')
+
+    console.log('---------------------------------------')
+    console.log('Gerando nova vela')
+
+    while (true) {
+        for(let i = 0; i < loopTime; i++) {
+          const price = await readPrice()
+          candles.addValue(price)
+          console.log(`Preço do mercado #${i + 1} de ${loopTime}`);
+          await new Promise(r => setTimeout(r, Period.TEN_SECONDS))
+        }   
+        
+        candles.closeCandles()
+        console.log('Fechando vela');
+        console.log(candles.toSimpleObject());
+        
+        
+    }
+}
+
+generateCandles()
