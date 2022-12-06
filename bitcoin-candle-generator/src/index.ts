@@ -3,6 +3,7 @@ import { InternalError } from "./utils/errors/InternalError";
 import axios, {AxiosError} from "axios";
 import Period from "./enums/Period";
 import Candle from "./models/Candle";
+import { createMessageChannel } from "./messages/messageChannel";
 
 config()
 
@@ -42,26 +43,35 @@ const readPrice = async (): Promise<number> => {
 
 
 const generateCandles = async () => {
-    const loopTime = Period.ONE_MINUTE / Period.TEN_SECONDS
-    const candles = new Candle('BTC')
-
-    console.log('---------------------------------------')
-    console.log('Gerando nova vela')
+  
+  const channelMessage = await createMessageChannel()
+  
+  if (channelMessage) {
 
     while (true) {
-        for(let i = 0; i < loopTime; i++) {
-          const price = await readPrice()
-          candles.addValue(price)
-          console.log(`Preço do mercado #${i + 1} de ${loopTime}`);
-          await new Promise(r => setTimeout(r, Period.TEN_SECONDS))
-        }   
-        
-        candles.closeCandles()
-        console.log('Fechando vela');
-        console.log(candles.toSimpleObject());
-        
-        
-    }
+      const loopTime = Period.ONE_MINUTE / Period.TEN_SECONDS
+      const candles = new Candle('BTC')
+      for(let i = 0; i < loopTime; i++) {
+        const price = await readPrice()
+        candles.addValue(price)
+        console.log(`Preço do mercado #${i + 1} de ${loopTime}`);
+        await new Promise(r => setTimeout(r, Period.TEN_SECONDS))
+      }   
+      
+      console.log('---------------------------------------')
+      console.log('Gerando nova vela')
+      candles.closeCandles()
+      console.log('Fechando vela');
+      const candleObj = candles.toSimpleObject()
+      console.log(candleObj)
+      const candleJSON = JSON.stringify(candleObj)
+      channelMessage.sendToQueue(process.env.QUEUE_NAME, Buffer.from(candleJSON))
+      console.log('Vela enviada para a fila');
+          
+          
+      }
+  }
+
 }
 
 generateCandles()

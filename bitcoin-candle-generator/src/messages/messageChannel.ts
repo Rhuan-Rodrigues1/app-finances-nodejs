@@ -24,7 +24,7 @@ export const createMessageChannel = async (): Promise<Channel> => {
         return channel
     } catch (err) {
         if(err) {
-            throw new ConnectionChannelError(`Error code status: ${err.status}`)
+            throw new ConnectionChannelError(err)
         }
     }
 }
