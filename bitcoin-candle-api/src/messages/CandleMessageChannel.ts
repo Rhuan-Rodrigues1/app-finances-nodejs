@@ -26,10 +26,9 @@ export default class CandleMessageChannel {
             
         })
 
-        this._createMessageChannel()
     }
 
-    private async _createMessageChannel() {
+   private async _createMessageChannel() {
         try {
             const connection = await connect(process.env.AMQP_SERVER)
             this._channel = await connection.createChannel()
@@ -39,25 +38,29 @@ export default class CandleMessageChannel {
         }
     }
 
-    consumeMessage() {
-        this._channel.consume(process.env.QUEUE_NAME, async (msg) => {
-            const candleObj = JSON.parse(msg.content.toString())
-            console.log("message received");
-            console.log(candleObj);
+    async consumeMessage() {
+        await this._createMessageChannel()
+        if(this._channel) {
 
-            this._channel.ack(msg)
+            this._channel.consume(process.env.QUEUE_NAME, async (msg) => {
+                const candleObj = JSON.parse(msg.content.toString())
+                console.log("message received");
+                console.log(candleObj);
 
-            const candle: Candle = candleObj
-            await this._candleCtrl.save(candle)
-            console.log("candle saved to database");
-            this._io.emit(process.env.SOCKET_EVENT_NAME, candle)
-            console.log("New candle emited by web socket");
+                this._channel.ack(msg)
+
+                const candle: Candle = candleObj
+                await this._candleCtrl.save(candle)
+                console.log("candle saved to database");
+                this._io.emit(process.env.SOCKET_EVENT_NAME, candle)
+                console.log("New candle emited by web socket");
+                
+                
+                
+                
+            })
+            console.log("Candle Consume started");
             
-            
-            
-            
-        })
-        console.log("Candle Consume started");
-        
+        }
     }
 }

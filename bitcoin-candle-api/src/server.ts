@@ -2,6 +2,7 @@ import { app } from "./app";
 import { config } from "dotenv";
 import { connectToMongo } from "./config/db";
 import { connection } from "mongoose";
+import CandleMessageChannel from "./messages/CandleMessageChannel";
 
 config()
 
@@ -15,6 +16,9 @@ async function createServer () {
         console.log("App running on port " + PORT);
         
     })
+
+    const candleMessageChannnel = new CandleMessageChannel(server)
+    candleMessageChannnel.consumeMessage()
 
     process.on("SIGINT", async () => {
         await connection.close()
